@@ -1,7 +1,7 @@
 <Solution>
-  <Project Path="Aspire/GlitchGame.Aspire.AppHost/GlitchGame.Aspire.AppHost.csproj" Id="24cadb01-ca9c-48c8-acc5-02c7a2b8aeea" />
-  <Project Path="Aspire/GlitchGame.Aspire.ServiceDefaults/GlitchGame.Aspire.ServiceDefaults.csproj" Id="5a29529d-f16c-45ca-be04-79cb0547c626" />
-  <Project Path="GlitchGame.ApiService/GlitchGame.ApiService.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="GlitchGame.Shared/GlitchGame.Shared.csproj" Id="533029a6-b0ef-436e-aa37-cd548112224c" />
   <Project Path="GlitchGame.Web/GlitchGame.Web.csproj" />
 </Solution>
