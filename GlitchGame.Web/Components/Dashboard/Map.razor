@@ -1,0 +1,96 @@
+﻿@using GlitchGame.Shared
+@using GlitchGame.Shared.Dto
+@using GlitchGame.Web.Services
+
+@inject MapService MapService
+@inject PointsTracker PointsTracker
+@implements IDisposable
+
+
+<div id="container">
+    <div style="--size: @(RelativeDistrictSizes[Districts.Forge])rem;" id="forge" class="district" />
+    <div style="--size: @(RelativeDistrictSizes[Districts.Mirage])rem;" id="mirage" class="district" />
+    <div style="--size: @(RelativeDistrictSizes[Districts.Neon])rem;" id="neon" class="district" />
+    <div style="--size: @(RelativeDistrictSizes[Districts.Pink])rem;" id="pink" class="district" />
+    <div style="--size: @(RelativeDistrictSizes[Districts.Tokyo])rem;" id="tokyo" class="district" />
+    <div style="--size: @(RelativeDistrictSizes[Districts.Tilted])rem;" id="tilted" class="district" />
+</div>
+@code {
+    Dictionary<Districts, int> DistrictPoints { get; set; }
+= new Dictionary<Districts, int>
+{
+        { Districts.Forge, 0 },
+        { Districts.Mirage, 0 },
+        { Districts.Neon, 0 },
+        { Districts.Pink, 0 },
+        { Districts.Tokyo, 0 },
+        { Districts.Tilted, 0 }
+};
+
+    Dictionary<Districts, decimal> RelativeDistrictSizes { get; set; }
+= new Dictionary<Districts, decimal>
+{
+        { Districts.Forge, 0 },
+        { Districts.Mirage, 0 },
+        { Districts.Neon, 0 },
+        { Districts.Pink, 0 },
+        { Districts.Tokyo, 0 },
+        { Districts.Tilted, 0 }
+};
+
+    protected override void OnInitialized()
+    {
+        MapService.OnMapUpdated += UpdateDistrictSize;
+
+        DistrictPoints = PointsTracker.GetDistrictPoints();
+
+        RelativeDistrictSizes = GetRelativeDistrictSizes(DistrictPoints);
+
+        base.OnInitialized();
+    }
+
+    protected void UpdateDistrictSize(MapUpdate update)
+    {
+        InvokeAsync(() =>
+        {
+            DistrictPoints[update.District] = update.NewPoints;
+            RelativeDistrictSizes = GetRelativeDistrictSizes(DistrictPoints);
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        MapService.OnMapUpdated -= UpdateDistrictSize;
+    }
+
+    public Dictionary<Districts, decimal> GetRelativeDistrictSizes(Dictionary<Districts, int> absoluteValues)
+    {
+        Console.WriteLine("Absolute values");
+        foreach (var kvp in absoluteValues)
+        {
+            Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+        }
+        const decimal sizeModifier = 15;
+
+        var total = absoluteValues.Values.Sum();
+        Console.WriteLine($"Total points {total}");
+        var ret = new Dictionary
+<Districts, decimal>();
+
+        foreach (var kvp in absoluteValues)
+        {
+            ret.Add(kvp.Key, (total > 0 ? (decimal)kvp.Value / (decimal)total : 0) * sizeModifier);
+        }
+
+        Console.WriteLine("relative values");
+        foreach (var kvp in ret)
+        {
+            Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+        }
+
+        return ret;
+
+    }
+
+}

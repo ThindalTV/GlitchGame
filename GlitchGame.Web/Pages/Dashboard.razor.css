@@ -1,0 +1,100 @@
+#questionPopup {
+    display: none;
+}
+
+#pageContent {
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    gap: 24px;
+    padding: 1.5rem;
+    background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.03), transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.03), transparent 50%);
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.02);
+    }
+}
+
+#map {
+    aspect-ratio: 1200 / 1720;
+    height: 100%;
+    background-image: url('/image/seatmap.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    flex-shrink: 0;
+    border-radius: 16px;
+    box-shadow: 
+        0 20px 50px -10px rgba(0, 0, 0, 0.5),
+        0 10px 30px -5px rgba(0, 0, 0, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.15),
+        inset 0 2px 0 rgba(255, 255, 255, 0.08);
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+#map::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+#chat {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    border-radius: 16px;
+    box-shadow: 
+        0 16px 40px -8px rgba(0, 0, 0, 0.4),
+        0 8px 24px -4px rgba(0, 0, 0, 0.25),
+        0 0 0 2px rgba(255, 255, 255, 0.12),
+        inset 0 2px 0 rgba(255, 255, 255, 0.06);
+    position: relative;
+    animation: slideInRight 0.5s ease-out;
+    padding: 1.5rem;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scrollbar styling for depth */
+#chat::-webkit-scrollbar {
+    width: 10px;
+}
+
+#chat::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+#chat::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}

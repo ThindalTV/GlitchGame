@@ -1,0 +1,98 @@
+﻿@rendermode @(new InteractiveServerRenderMode())
+@using GlitchGame.Shared
+@using GlitchGame.Web.Services
+
+
+
+@implements IDisposable
+
+<div class="chat-panel">
+    <h3>Chat</h3>
+
+    <table class="chat-table">
+        <colgroup>
+            <col class="col-district" />
+            <col class="col-user" />
+            <col class="col-message" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th scope="col">Distrikt</th>
+                <th scope="col">Nick</th>
+                <th scope="col">Meddelande</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var message in Messages.Where(m => !m.Redacted).Reverse())
+            {
+                <tr>
+                    <td class="district-cell">
+                        <span class="district-marker" style="background-color: @GetDistrictColor(message.District)"></span>
+                        <span class="district-name">@message.District</span>
+                    </td>
+                    <td class="user-cell">@message.User</td>
+                    <td class="message-cell">@message.Message</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="chat-count">Antal meddelanden: @Messages.Count</div>
+</div>
+
+@inject ChatService ChatService
+@code {
+    private List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+
+
+    protected override void OnInitialized()
+    {
+        ChatService.OnMessageReceived += HandleMessageReceived;
+        ChatService.OnMessageChanged += HandleMessageChanged;
+        base.OnInitialized();
+    }
+
+    private void HandleMessageReceived(ChatMessage message)
+    {
+        Messages.Add(message);
+        InvokeAsync(() =>StateHasChanged());
+    }
+
+    private void HandleMessageChanged(ChatMessage message)
+    {
+        var msg = Messages.FirstOrDefault(m => m.Id == message.Id);
+        if(msg == null)
+        {
+            return;
+        }
+
+        var index = Messages.IndexOf(msg);
+        Messages.Remove(msg);
+
+        msg = msg with
+        {
+            Message = message.Message,
+            Redacted = message.Redacted
+        };
+
+        Messages.Insert(index, msg);
+        InvokeAsync(() => StateHasChanged());
+    }
+
+    private static string GetDistrictColor(Districts district) => district switch
+    {
+        Districts.Forge => "#3f2bff",
+        Districts.Mirage => "#f5a623",
+        Districts.Neon => "#ff0057",
+        Districts.Pink => "#f03aa8",
+        Districts.Tokyo => "#6d35ff",
+        Districts.Tilted => "#f7d300",
+        _ => "#94a3b8"
+    };
+
+    public void Dispose()
+    {
+        ChatService.OnMessageReceived -= HandleMessageReceived;
+        ChatService.OnMessageChanged -= HandleMessageChanged;
+    }
+}

@@ -1,0 +1,67 @@
+﻿@page "/visitor"
+@rendermode @(new InteractiveServerRenderMode())
+@using GlitchGame.Web.Components.Dashboard
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@using GlitchGame.Shared
+@using GlitchGame.Web.Services
+
+@inject ChatService ChatService
+
+<h3>Visitor</h3>
+@if (!onboarded)
+{
+    <p>Welcome to the visitor page! You are not onboarded yet.</p>
+    <p>What is your nickname? <InputText @bind-Value="Nickname" /></p>
+    <p>Where are you seated? <InputSelect @bind-Value="District" >
+        <option value="">Select a District</option>
+        @foreach (var district in Enum.GetValues<Districts>())
+        {
+            <option value="@district">@district</option>
+        }
+    </InputSelect></p>
+    <button @onclick="StartChatting">Start the chaos</button>
+}
+else
+{
+    <Chat />
+    <div class="chatSender">
+        <InputText @bind-value="NewMessage" />
+        <button @onclick="SendMessage">Send message</button>
+    </div>
+}
+
+
+
+@code {
+    bool onboarded = false;
+
+    public string Nickname { get; set; } = string.Empty;
+    public Districts? District { get; set; }
+
+    public string NewMessage { get; set; } = string.Empty;
+
+    public void StartChatting()
+    {
+        if (!string.IsNullOrWhiteSpace(Nickname) && District.HasValue)
+        {
+            onboarded = true;
+        }
+    }
+
+    public void SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(NewMessage))
+        {
+            // Here you would typically send the message to a service or backend
+            ChatService.SendMessage(new ChatMessage
+            {
+                User = Nickname,
+                District = District!.Value,
+                Message = NewMessage,
+                Timestamp = DateTime.UtcNow
+            });
+            NewMessage = string.Empty; // Clear the input after sending
+        }
+    }
+}
